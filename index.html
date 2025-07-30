@@ -3,21 +3,20 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Carte interactive AHPV avec recherche</title>
+  <title>Carte interactive AHPV – Version interactive corrigée</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
-      background: #f7fbff;
+      background: #f8f9fa;
     }
     header {
-      background: #2f80ed;
+      background-color: #007acc;
       color: white;
-      padding: 12px;
       text-align: center;
+      padding: 1em;
     }
     #map {
       height: 85vh;
@@ -29,15 +28,16 @@
       text-align: center;
     }
     input[type="text"] {
-      padding: 6px;
+      padding: 8px;
       width: 60%;
-      font-size: 1em;
+      max-width: 600px;
+      font-size: 16px;
     }
     footer {
       text-align: center;
-      font-size: 0.8em;
-      padding: 6px;
-      background: #e2eaf4;
+      font-size: 0.9em;
+      background-color: #e2eaf4;
+      padding: 8px;
     }
   </style>
 </head>
@@ -53,18 +53,22 @@
   <div id="map"></div>
 
   <footer>
-    © Amis de l'Histoire du Pays Vizillois – Cartographie locale
+    © Les Amis de l'Histoire du Pays Vizillois
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
     const map = L.map('map').setView([45.08, 5.77], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap',
-      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 18
     }).addTo(map);
 
     const markers = [];
+
+    function normalize(text) {
+      return text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    }
 
     fetch('data_villes_connues_quoted.csv')
       .then(response => response.text())
@@ -80,19 +84,24 @@
           const ville = cols[4];
           const lat = parseFloat(cols[5]);
           const lon = parseFloat(cols[6]);
+
           if (!isNaN(lat) && !isNaN(lon)) {
-            const content = `<strong>${titre}</strong><br/><em>N°${numero}</em><br/><b>Ville :</b> ${ville}<br/><b>Auteur :</b> ${auteur}<br/><b>Thème :</b> ${theme}`;
-            const marker = L.marker([lat, lon]).bindPopup(content).addTo(map);
-            marker.meta = [titre, numero, auteur, theme, ville].join(' ').toLowerCase();
+            const popup = `<strong>${titre}</strong><br><b>N°</b> ${numero}<br><b>Ville :</b> ${ville}<br><b>Auteur :</b> ${auteur}<br><b>Thème :</b> ${theme}`;
+            const marker = L.marker([lat, lon]).addTo(map);
+            marker.bindPopup(popup);
+            marker.meta = normalize(`${titre} ${numero} ${auteur} ${theme} ${ville}`);
             markers.push(marker);
           }
         });
+      })
+      .catch(err => {
+        alert("Erreur de chargement des données CSV : " + err);
       });
 
     document.getElementById('searchInput').addEventListener('input', function () {
-      const value = this.value.trim().toLowerCase();
+      const term = normalize(this.value.trim());
       markers.forEach(marker => {
-        const match = marker.meta.includes(value);
+        const match = marker.meta.includes(term);
         if (match) {
           marker.addTo(map);
         } else {
