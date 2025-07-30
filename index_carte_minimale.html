@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Carte interactive AHPV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f9ff;
+    }
+    header {
+      background: #3366cc;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    #map {
+      height: 90vh;
+      width: 100%;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.8em;
+      padding: 5px;
+      background: #eef3fa;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Carte interactive des publications AHPV</h2>
+  </header>
+  <div id="map"></div>
+  <footer>
+    © Amis de l'Histoire du Pays Vizillois – Données locales
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([45.08, 5.77], 11);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+      maxZoom: 18,
+    }).addTo(map);
+
+    fetch('data_villes_connues.csv')
+      .then((response) => response.text())
+      .then((csv) => {
+        const rows = csv.split('\n').slice(1);
+        rows.forEach((row) => {
+          const cols = row.split(',');
+          if (cols.length >= 6) {
+            const numero = cols[0];
+            const titre = cols[1];
+            const auteurs = cols[2];
+            const themes = cols[3];
+            const ville = cols[4];
+            const lat = parseFloat(cols[5]);
+            const lon = parseFloat(cols[6]);
+            if (!isNaN(lat) && !isNaN(lon)) {
+              const popup = `<strong>${titre}</strong><br/>N°${numero}<br/><em>${ville}</em><br/>Thème(s): ${themes}<br/>Auteur(s): ${auteurs}`;
+              L.marker([lat, lon]).addTo(map).bindPopup(popup);
+            }
+          }
+        });
+      });
+  </script>
+</body>
+</html>
