@@ -1,97 +1,62 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <title>📊 Publications des Amis de l’Histoire du Pays Vizillois</title>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" />
+    <meta charset="UTF-8">
+    <title>Base Publications - Amis de l’Histoire du Pays Vizillois</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #fefbf7; }
-        h1 { text-align: center; color: #333; }
-        #data-table_wrapper { margin-top: 30px; }
-        header img { height: 50px; vertical-align: middle; }
-        header { text-align: center; }
-        #csv-upload { display: none; text-align: right; margin-bottom: 1em; }
-        #csv-upload label { font-weight: bold; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #faf7f2; color: #232323; margin: 0; padding: 2em; }
+        .container { background: #fffbe6; border-radius: 18px; box-shadow: 0 2px 16px #0001; padding: 2em; max-width: 1080px; margin: 2em auto; }
+        h1 { margin-bottom: 0.5em; font-size: 2rem; }
+        .logo { float: right; width: 75px; margin: 0 0 1em 2em; }
+        table.dataTable { background: #fffdf6; }
+        th, td { font-size: 1rem; }
+        .dt-buttons { margin-bottom: 0.5em; }
     </style>
 </head>
 <body>
-    <header>
-        <img src="logo_ahpv.png" alt="Logo AHPV">
-        <h1>📊 Publications des Amis de l’Histoire du Pays Vizillois</h1>
-    </header>
-
-    <div id="csv-upload">
-      <label>Téléverser un nouveau CSV :
-        <input type="file" id="upload-csv" accept=".csv" style="display:inline;">
-      </label>
-    </div>
-
+<div class="container">
+    <img src="logo_ahpv.png" alt="Logo AHPV" class="logo">
+    <h1>Publications des Amis de l’Histoire du Pays Vizillois</h1>
+    <p><strong>Source :</strong> base_ahpv_2025_final_noblank.csv</p>
     <table id="data-table" class="display" style="width:100%"></table>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script>
-      // Raccourci Ctrl+U pour afficher le bouton d'upload
-      document.addEventListener("keydown", function(e) {
-        if (e.ctrlKey && e.key.toLowerCase() === "u") {
-          document.getElementById("csv-upload").style.display = "block";
-        }
-      });
-
-      // Gestion de l'import CSV local
-      document.getElementById("upload-csv").addEventListener("change", function(e) {
-        var file = e.target.files[0];
-        if (!file) return;
-        Papa.parse(file, {
-          header: true,
-          skipEmptyLines: true,
-          complete: function(results) {
-            // Détruit l'ancien DataTable si déjà existant
-            if ($.fn.DataTable.isDataTable("#data-table")) {
-              $('#data-table').DataTable().destroy();
-              $('#data-table').empty();
-            }
-            var columns = Object.keys(results.data[0]).map(function(key) {
-              return { title: key, data: key };
-            });
-            $('#data-table').DataTable({
-              data: results.data,
-              columns: columns,
-              dom: 'Blfrtip',
-              buttons: ['csv', 'excel'],
-              pageLength: 25,
-              lengthMenu: [ [10, 25, 50, 100, 250, 500, -1], [10, 25, 50, 100, 250, 500, "Tous"] ],
-              language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json" }
-            });
-          }
-        });
-      });
-
-      // Chargement initial de la base principale
-      Papa.parse("base_ahpv_visible_full.csv", {
-        download: true,
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+$(document).ready(function() {
+    Papa.parse('base_ahpv_2025_final_noblank.csv', {
         header: true,
+        download: true,
         skipEmptyLines: true,
         complete: function(results) {
-          var data = results.data;
-          var columns = Object.keys(data[0]).map(function(key) {
-            return { title: key, data: key };
-          });
-          $('#data-table').DataTable({
-            data: data,
-            columns: columns,
-            dom: 'Blfrtip',
-            buttons: ['csv', 'excel'],
-            pageLength: 25,
-            lengthMenu: [ [10, 25, 50, 100, 250, 500, -1], [10, 25, 50, 100, 250, 500, "Tous"] ],
-            language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json" }
-          });
+            var data = results.data;
+            // Générer dynamiquement les colonnes
+            var columns = Object.keys(data[0]).map(function(key) { return { title: key, data: key }; });
+            $('#data-table').DataTable({
+                data: data,
+                columns: columns,
+                order: [],
+                dom: 'Bfrtip',
+                pageLength: 25,
+                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tout"] ],
+                buttons: ['copy', 'csv', 'excel', 'print'],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json",
+                    search: "Recherche :",
+                    lengthMenu: "Afficher _MENU_ lignes",
+                    info: "Affichage de _START_ à _END_ sur _TOTAL_ enregistrements"
+                }
+            });
         }
-      });
-    </script>
+    });
+});
+</script>
 </body>
 </html>
