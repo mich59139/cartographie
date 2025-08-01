@@ -5,18 +5,29 @@
     <title>Base Publications - Amis de l’Histoire du Pays Vizillois</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #faf7f2; color: #232323; margin: 0; padding: 2em; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: #faf7f2; 
+            color: #232323; 
+            margin: 0; 
+            padding: 2em; 
+        }
+        .bande-encadrement {
+            background: #e6e7ec;
+            padding: 2.5em 0;
+        }
         .container {
             background: #fffbe6;
             border-radius: 18px;
             box-shadow: 0 2px 16px #0001;
             padding: 2em;
-            max-width: 98vw;
+            max-width: 820px;
             margin: 2em auto;
+            border: 2px solid #dadada;
         }
         h1 { margin-bottom: 0.5em; font-size: 2rem; }
         .logo { float: right; width: 75px; margin: 0 0 1em 2em; }
-        #data-table { width: 100% !important; min-width: 900px; }
+        #data-table { width: 100% !important; min-width: 640px; }
         table.dataTable { width: 100% !important; }
         .dataTables_length, label[for="data-table_length"], select[name="data-table_length"] {
             display: inline-block !important;
@@ -33,15 +44,18 @@
         .dt-buttons { margin-bottom: 0.5em; }
         @media (max-width: 900px) {
             #data-table { min-width: 350px; }
+            .container { max-width: 98vw; }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <img src="logo_ahpv.png" alt="Logo AHPV" class="logo">
-    <h1>Publications des Amis de l’Histoire du Pays Vizillois</h1>
-    <p><strong>Source :</strong> base_ahpv_2025_final_noblank.csv</p>
-    <table id="data-table" class="display" style="width:100%"></table>
+<div class="bande-encadrement">
+    <div class="container">
+        <img src="logo_ahpv.png" alt="Logo AHPV" class="logo">
+        <h1>Publications des Amis de l’Histoire du Pays Vizillois</h1>
+        <p><strong>Source :</strong> base_ahpv_2025_final_noblank.csv</p>
+        <table id="data-table" class="display" style="width:100%"></table>
+    </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
@@ -65,7 +79,7 @@ $(document).ready(function() {
                 lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tout"] ],
                 pageLength: 25,
                 order: [],
-                dom: 'lBfrtip', // <-- bouton nombre d'entrées bien visible
+                dom: 'lBfrtip', // menu du nombre d’entrées bien visible
                 buttons: ['copy', 'csv', 'excel', 'print'],
                 language: {
                     url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json",
