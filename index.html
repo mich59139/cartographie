@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>📊 Publications des Amis de l’Histoire du Pays Vizillois</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" />
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #fefbf7; }
+        h1 { text-align: center; color: #333; }
+        #data-table_wrapper { margin-top: 30px; }
+        header img { height: 50px; vertical-align: middle; }
+        header { text-align: center; }
+        #csv-upload { display: none; text-align: right; margin-bottom: 1em; }
+        #csv-upload label { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="logo_ahpv.png" alt="Logo AHPV">
+        <h1>📊 Publications des Amis de l’Histoire du Pays Vizillois</h1>
+    </header>
+
+    <div id="csv-upload">
+      <label>Téléverser un nouveau CSV :
+        <input type="file" id="upload-csv" accept=".csv" style="display:inline;">
+      </label>
+    </div>
+
+    <table id="data-table" class="display" style="width:100%"></table>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+      // Raccourci Ctrl+U pour afficher le bouton d'upload
+      document.addEventListener("keydown", function(e) {
+        if (e.ctrlKey && e.key.toLowerCase() === "u") {
+          document.getElementById("csv-upload").style.display = "block";
+        }
+      });
+
+      // Gestion de l'import CSV local
+      document.getElementById("upload-csv").addEventListener("change", function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            // Détruit l'ancien DataTable si déjà existant
+            if ($.fn.DataTable.isDataTable("#data-table")) {
+              $('#data-table').DataTable().destroy();
+              $('#data-table').empty();
+            }
+            var columns = Object.keys(results.data[0]).map(function(key) {
+              return { title: key, data: key };
+            });
+            $('#data-table').DataTable({
+              data: results.data,
+              columns: columns,
+              dom: 'Blfrtip',
+              buttons: ['csv', 'excel'],
+              pageLength: 25,
+              lengthMenu: [ [10, 25, 50, 100, 250, 500, -1], [10, 25, 50, 100, 250, 500, "Tous"] ],
+              language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json" }
+            });
+          }
+        });
+      });
+
+      // Chargement initial de la base principale
+      Papa.parse("base_ahpv_visible_full.csv", {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          var data = results.data;
+          var columns = Object.keys(data[0]).map(function(key) {
+            return { title: key, data: key };
+          });
+          $('#data-table').DataTable({
+            data: data,
+            columns: columns,
+            dom: 'Blfrtip',
+            buttons: ['csv', 'excel'],
+            pageLength: 25,
+            lengthMenu: [ [10, 25, 50, 100, 250, 500, -1], [10, 25, 50, 100, 250, 500, "Tous"] ],
+            language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json" }
+          });
+        }
+      });
+    </script>
+</body>
+</html>
