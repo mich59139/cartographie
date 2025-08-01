@@ -21,7 +21,7 @@
             border-radius: 18px;
             box-shadow: 0 2px 16px #0001;
             padding: 2em;
-            max-width: 1620px;
+            max-width: 820px;
             margin: 2em auto;
             border: 2px solid #dadada;
         }
@@ -65,7 +65,7 @@
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.1.0/docx.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.1.0-beta.2/docx.umd.min.js"></script>
 <script>
 $(document).ready(function() {
     Papa.parse('base_ahpv_2025_final_noblank.csv', {
@@ -105,6 +105,11 @@ $(document).ready(function() {
                 const { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } = window.docx;
                 const filteredData = dt.rows({search:'applied'}).data().toArray();
 
+                if (filteredData.length === 0) {
+                    alert("Aucun résultat à exporter !");
+                    return;
+                }
+
                 // Générer l'entête du tableau Word
                 const tableHeader = new TableRow({
                     children: columns.map(col => 
@@ -142,6 +147,8 @@ $(document).ready(function() {
 
                 Packer.toBlob(doc).then(blob => {
                     saveAs(blob, "export_ahpv_filtré.docx");
+                }).catch(function(error){
+                    alert("Erreur à l'export Word : " + error);
                 });
             }
         }
