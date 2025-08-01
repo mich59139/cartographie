@@ -64,6 +64,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.1.0/docx.umd.min.js"></script>
 <script>
 $(document).ready(function() {
     Papa.parse('base_ahpv_2025_final_noblank.csv', {
@@ -73,14 +75,23 @@ $(document).ready(function() {
         complete: function(results) {
             var data = results.data;
             var columns = Object.keys(data[0]).map(function(key) { return { title: key, data: key }; });
-            $('#data-table').DataTable({
+
+            var dt = $('#data-table').DataTable({
                 data: data,
                 columns: columns,
                 lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tout"] ],
                 pageLength: 25,
                 order: [],
-                dom: 'lBfrtip', // menu du nombre d’entrées bien visible
-                buttons: ['copy', 'csv', 'excel', 'print'],
+                dom: 'lBfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'print',
+                    {
+                        text: 'Exporter en Word',
+                        action: function ( e, dt, node, config ) {
+                            exportToWord(dt, columns);
+                        }
+                    }
+                ],
                 language: {
                     url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json",
                     search: "Recherche :",
@@ -88,6 +99,51 @@ $(document).ready(function() {
                     info: "Affichage de _START_ à _END_ sur _TOTAL_ enregistrements"
                 }
             });
+
+            // Fonction d'export Word
+            function exportToWord(dt, columns) {
+                const { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } = window.docx;
+                const filteredData = dt.rows({search:'applied'}).data().toArray();
+
+                // Générer l'entête du tableau Word
+                const tableHeader = new TableRow({
+                    children: columns.map(col => 
+                        new TableCell({children: [new Paragraph({children:[new TextRun({text: col.title, bold: true})]})]})
+                    )
+                });
+
+                // Les lignes du tableau
+                const tableRows = filteredData.map(row =>
+                    new TableRow({
+                        children: columns.map(col => 
+                            new TableCell({children: [new Paragraph((row[col.data] || "") + "")]})
+                        )
+                    })
+                );
+
+                // Tableau Word
+                const table = new Table({
+                    width: { size: 100, type: WidthType.PERCENTAGE },
+                    rows: [tableHeader, ...tableRows]
+                });
+
+                const doc = new Document({
+                    sections: [{
+                        properties: {},
+                        children: [
+                            new Paragraph({
+                                children: [new TextRun({text: "Export filtré – Publications des Amis de l’Histoire du Pays Vizillois", bold: true, size: 28})],
+                                spacing: { after: 250 }
+                            }),
+                            table
+                        ]
+                    }]
+                });
+
+                Packer.toBlob(doc).then(blob => {
+                    saveAs(blob, "export_ahpv_filtré.docx");
+                });
+            }
         }
     });
 });
