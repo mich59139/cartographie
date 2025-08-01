@@ -18,6 +18,17 @@
         .logo { float: right; width: 75px; margin: 0 0 1em 2em; }
         #data-table { width: 100% !important; min-width: 900px; }
         table.dataTable { width: 100% !important; }
+        .dataTables_length, label[for="data-table_length"], select[name="data-table_length"] {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            color: #232323;
+            font-size: 1rem;
+        }
+        .dataTables_wrapper .dataTables_length select {
+            width: auto !important;
+            display: inline-block !important;
+        }
         .dataTables_length { display: block !important; margin-bottom: 1em; }
         .dt-buttons { margin-bottom: 0.5em; }
         @media (max-width: 900px) {
@@ -54,7 +65,7 @@ $(document).ready(function() {
                 lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tout"] ],
                 pageLength: 25,
                 order: [],
-                dom: 'Bfrtip',
+                dom: 'lBfrtip', // <-- bouton nombre d'entrées bien visible
                 buttons: ['copy', 'csv', 'excel', 'print'],
                 language: {
                     url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json",
