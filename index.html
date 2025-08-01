@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,30 +5,24 @@
     <title>Base Publications - Amis de l’Histoire du Pays Vizillois</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #faf7f2; color: #232323; margin: 0; padding: 2em; }
         .container {
-    background: #fffbe6;
-    border-radius: 18px;
-    box-shadow: 0 2px 16px #0001;
-    padding: 2em;
-    max-width: 98vw;
-    margin: 2em auto;
-}
-#data-table {
-    width: 100% !important;
-    min-width: 900px;
-}
-table.dataTable {
-    width: 100% !important;
-}
-.dataTables_length {
-    display: block !important;
-    margin-bottom: 1em;
-}
-@media (max-width: 900px) {
-    #data-table {
-        min-width: 350px;
-    }
-}
+            background: #fffbe6;
+            border-radius: 18px;
+            box-shadow: 0 2px 16px #0001;
+            padding: 2em;
+            max-width: 98vw;
+            margin: 2em auto;
+        }
+        h1 { margin-bottom: 0.5em; font-size: 2rem; }
+        .logo { float: right; width: 75px; margin: 0 0 1em 2em; }
+        #data-table { width: 100% !important; min-width: 900px; }
+        table.dataTable { width: 100% !important; }
+        .dataTables_length { display: block !important; margin-bottom: 1em; }
+        .dt-buttons { margin-bottom: 0.5em; }
+        @media (max-width: 900px) {
+            #data-table { min-width: 350px; }
+        }
     </style>
 </head>
 <body>
@@ -54,15 +47,14 @@ $(document).ready(function() {
         skipEmptyLines: true,
         complete: function(results) {
             var data = results.data;
-            // Générer dynamiquement les colonnes
             var columns = Object.keys(data[0]).map(function(key) { return { title: key, data: key }; });
             $('#data-table').DataTable({
                 data: data,
                 columns: columns,
+                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tout"] ],
+                pageLength: 25,
                 order: [],
                 dom: 'Bfrtip',
-                pageLength: 25,
-                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tout"] ],
                 buttons: ['copy', 'csv', 'excel', 'print'],
                 language: {
                     url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json",
