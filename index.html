@@ -1,41 +1,82 @@
-body { 
-    font-family: 'Segoe UI', Arial, sans-serif; 
-    background: #faf7f2; 
-    color: #232323; 
-    margin: 0; 
-    padding: 2em; 
-}
-.bande-encadrement {
-    background: #e6e7ec;
-    padding: 2.5em 0;
-}
-.container {
-    background: #fffbe6;
-    border-radius: 18px;
-    box-shadow: 0 2px 16px #0001;
-    padding: 2em;
-    max-width: 820px;
-    margin: 2em auto;
-    border: 2px solid #dadada;
-}
-h1 { margin-bottom: 0.5em; font-size: 2rem; }
-.logo { float: right; width: 75px; margin: 0 0 1em 2em; }
-#data-table { width: 100% !important; min-width: 640px; }
-table.dataTable { width: 100% !important; }
-.dataTables_length, label[for="data-table_length"], select[name="data-table_length"] {
-    display: inline-block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    color: #232323;
-    font-size: 1rem;
-}
-.dataTables_wrapper .dataTables_length select {
-    width: auto !important;
-    display: inline-block !important;
-}
-.dataTables_length { display: block !important; margin-bottom: 1em; }
-.dt-buttons { margin-bottom: 0.5em; }
-@media (max-width: 900px) {
-    #data-table { min-width: 350px; }
-    .container { max-width: 98vw; }
-}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Base Publications - Amis de l’Histoire du Pays Vizillois</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #faf7f2; color: #232323; margin: 0; padding: 2em; }
+        .container {
+            background: #fffbe6;
+            border-radius: 18px;
+            box-shadow: 0 2px 16px #0001;
+            padding: 2em;
+            max-width: 98vw;
+            margin: 2em auto;
+        }
+        h1 { margin-bottom: 0.5em; font-size: 2rem; }
+        .logo { float: right; width: 75px; margin: 0 0 1em 2em; }
+        #data-table { width: 100% !important; min-width: 900px; }
+        table.dataTable { width: 100% !important; }
+        .dataTables_length, label[for="data-table_length"], select[name="data-table_length"] {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            color: #232323;
+            font-size: 1rem;
+        }
+        .dataTables_wrapper .dataTables_length select {
+            width: auto !important;
+            display: inline-block !important;
+        }
+        .dataTables_length { display: block !important; margin-bottom: 1em; }
+        .dt-buttons { margin-bottom: 0.5em; }
+        @media (max-width: 900px) {
+            #data-table { min-width: 350px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="logo_ahpv.png" alt="Logo AHPV" class="logo">
+    <h1>Publications des Amis de l’Histoire du Pays Vizillois</h1>
+    <p><strong>Source :</strong> base_ahpv_2025_final_noblank.csv</p>
+    <table id="data-table" class="display" style="width:100%"></table>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+$(document).ready(function() {
+    Papa.parse('base_ahpv_2025_final_noblank.csv', {
+        header: true,
+        download: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            var data = results.data;
+            var columns = Object.keys(data[0]).map(function(key) { return { title: key, data: key }; });
+            $('#data-table').DataTable({
+                data: data,
+                columns: columns,
+                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "Tout"] ],
+                pageLength: 25,
+                order: [],
+                dom: 'lBfrtip', // <-- bouton nombre d'entrées bien visible
+                buttons: ['copy', 'csv', 'excel', 'print'],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json",
+                    search: "Recherche :",
+                    lengthMenu: "Afficher _MENU_ lignes",
+                    info: "Affichage de _START_ à _END_ sur _TOTAL_ enregistrements"
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>
